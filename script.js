@@ -13,7 +13,7 @@ const QUESTIONS = [
   { id: 6, type: "yn", text: "Apakah kasur atau sofa di rumah Anda pernah dibersihkan secara profesional sebelumnya?" },
   { id: 7, type: "yn", text: "Apakah ada anak kecil, orang tua, atau hewan peliharaan di rumah?" },
   { id: 8, type: "yn", text: "Apakah ada rencana atau acara yang membuat rumah ramai dalam tiga bulan ke depan?" },
-  { id: 9, type: "single", text: "Kalau ada satu ruangan yang paling ingin Anda bereskan lebih dulu, ruangan mana?",
+  { id: 9, type: "multi", text: "Kalau ada satu ruangan yang paling ingin Anda bereskan lebih dulu, ruangan mana?",
     options: ["Kamar utama", "Kamar anak", "Kamar tamu", "Ruang keluarga", "Ruang lain"] },
 ];
 
@@ -56,6 +56,16 @@ function renderQuestion() {
     html += `<div class="options">` + q.options.map(opt =>
       `<button type="button" class="option-btn ${state.answers[q.id] === opt ? "selected" : ""}" onclick="answerAndNext(${q.id}, '${opt.replace(/'/g, "\\'")}')">${opt}</button>`
     ).join("") + `</div>`;
+  } else if (q.type === "multi") {
+    const selected = Array.isArray(state.answers[q.id]) ? state.answers[q.id] : [];
+    html += `<div class="multi-hint">Pilih minimal satu ruangan. Boleh pilih lebih dari satu.</div>`;
+    html += `<div class="options">` + q.options.map(opt => {
+      const isSel = selected.includes(opt);
+      return `<button type="button" class="option-btn multi ${isSel ? "selected" : ""}" onclick="toggleMulti(${q.id}, '${opt.replace(/'/g, "\\'")}')">
+        <span class="checkbox-box"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5L6.2 11.5L13 4.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        ${opt}
+      </button>`;
+    }).join("") + `</div>`;
   } else if (q.type === "number") {
     const val = state.answers[q.id] ?? "";
     html += `<div class="num-input-row">
@@ -66,6 +76,7 @@ function renderQuestion() {
   html += `<div class="q-nav">
     <button type="button" class="link-btn" onclick="prevQuestion()" ${state.current === 0 ? 'style="visibility:hidden"' : ""}>Kembali</button>
     ${q.type === "number" ? `<button type="button" class="btn" onclick="submitNumber(${q.id})">Lanjut</button>` : ""}
+    ${q.type === "multi" ? `<button type="button" class="btn" id="multiNextBtn" onclick="submitMulti(${q.id})">Lanjut</button>` : ""}
   </div>`;
 
   body.innerHTML = html;
@@ -86,6 +97,31 @@ function submitNumber(qid) {
     return;
   }
   state.answers[qid] = val;
+  goNext();
+}
+
+function toggleMulti(qid, option) {
+  const current = Array.isArray(state.answers[qid]) ? state.answers[qid].slice() : [];
+  const idx = current.indexOf(option);
+  if (idx >= 0) {
+    current.splice(idx, 1);
+  } else {
+    current.push(option);
+  }
+  state.answers[qid] = current;
+  renderQuestion();
+}
+
+function submitMulti(qid) {
+  const current = Array.isArray(state.answers[qid]) ? state.answers[qid] : [];
+  if (current.length < 1) {
+    const btn = document.getElementById("multiNextBtn");
+    if (btn) {
+      btn.style.background = "#e0554f";
+      setTimeout(() => { btn.style.background = ""; }, 600);
+    }
+    return;
+  }
   goNext();
 }
 
@@ -150,7 +186,7 @@ const RESULT_COPY = {
 <p>Dengan mempertahankan kebiasaan ini, rumah akan terasa semakin nyaman, segar, dan menyenangkan untuk ditinggali. Perawatan yang sudah berjalan baik hari ini menjadi fondasi penting untuk menjaga kesehatan dan kenyamanan keluarga dalam jangka panjang.</p>`,
 };
 
-const BADGE_LABEL = { low: "SKOR: PERLU PERHATIAN", medium: "SKOR: SUDAH DI JALUR YANG BAIK", high: "SKOR: PERAWATAN BERJALAN BAIK" };
+const BADGE_LABEL = { low: "PERLU PERHATIAN", medium: "SUDAH DI JALUR YANG BAIK", high: "PERAWATAN BERJALAN BAIK" };
 
 function submitLead() {
   const name = $("#leadName").value.trim();
@@ -166,20 +202,43 @@ function submitLead() {
   const score = computeScore();
   const category = categoryFor(score);
 
-  renderResult(category);
+  renderResult(category, score);
   sendLead(name, phone, score, category);
   show("screen-result");
 }
 
-function renderResult(category) {
-  $("#resultBadge").textContent = BADGE_LABEL[category];
+function renderResult(category, score) {
   $("#resultCopy").innerHTML = RESULT_COPY[category];
 
-  const room = state.answers[9] || "";
+  const numEl = $("#scoreCardNum");
+  const barEl = $("#scoreCardBarFill");
+  const catEl = $("#scoreCardCat");
+  numEl.textContent = score + "%";
+  numEl.className = "score-card-num cat-" + category;
+  barEl.className = "score-card-bar-fill cat-" + category;
+  barEl.style.width = score + "%";
+  catEl.textContent = BADGE_LABEL[category];
+  catEl.className = "score-card-cat cat-" + category;
+
+  const rooms = Array.isArray(state.answers[9]) ? state.answers[9] : [];
+  const roomText = rooms.length ? rooms.join(", ") : "belum dipilih";
   const waText = encodeURIComponent(
-    `[Skor Rest Assured] Halo admin, saya baru selesai assessment Skor Rest Assured. Kategori hasil saya: ${category}. Ruangan prioritas: ${room}. Saya ingin jadwalkan demonstrasi.`
+    `[Skor Rest Assured] Halo admin, saya baru selesai assessment Skor Rest Assured. Kategori hasil saya: ${category} (${score}%). Ruangan prioritas: ${roomText}. Saya ingin jadwalkan demonstrasi.`
   );
   $("#resultCtaBtn").href = `https://api.whatsapp.com/send?phone=${WA_ADMIN}&text=${waText}`;
+}
+
+function shareToInstagram() {
+  const text = "Saya baru selesai Skor Rest Assured dari HydroClean, coba juga di sini: " + window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: "Skor Rest Assured — HydroClean", text, url: window.location.href }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert("Link disalin. Tempel di caption atau story Instagram Anda.");
+    }).catch(() => {
+      alert("Buka Instagram dan tempel link ini: " + window.location.href);
+    });
+  }
 }
 
 function sendLead(name, phone, score, category) {
@@ -197,7 +256,7 @@ function sendLead(name, phone, score, category) {
     q6_pernahProfesional: state.answers[6] ?? null,
     q7_anakLansiaHewan: state.answers[7] ?? null,
     q8_acaraRamai: state.answers[8] ?? null,
-    q9_ruangPrioritas: state.answers[9] ?? null,
+    q9_ruangPrioritas: Array.isArray(state.answers[9]) ? state.answers[9].join(", ") : (state.answers[9] ?? null),
     timestamp: new Date().toISOString(),
   };
   fetch(GAS_WEBHOOK_URL, {
