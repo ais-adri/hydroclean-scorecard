@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skor Rest Assured — HydroClean</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300..700;1,9..40,300..700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#00AED0;
+    --blue-light:#5FCBE8;
+    --blue-tint:#D4F0F7;
+    --white:#FFFFFF;
+    --gray:#F2F4F6;
+    --ink:#1F2A30;
+    --ink-soft:#5A6870;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"DM Sans",sans-serif;background:var(--white);color:var(--ink);
+    line-height:1.7;font-weight:300;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:0 7vw}
+  @media(min-width:1300px){.wrap{padding:0 48px}}
+  .eyebrow{font-size:11px;letter-spacing:4px;text-transform:uppercase;font-weight:500;color:var(--ink-soft)}
+  h1{font-weight:300;font-size:clamp(34px,4.8vw,58px);line-height:1.2;letter-spacing:-0.01em;margin:22px 0 20px}
+  h2{font-weight:300;font-size:clamp(26px,3.2vw,38px);line-height:1.28;margin:16px 0 14px}
+  .lede{font-size:17px;font-weight:300;color:var(--ink-soft);max-width:520px}
+
+  nav{padding:34px 0;display:flex;justify-content:space-between;align-items:center}
+  .logo-img{height:56px;width:auto;display:block}
+
+  /* ---- screens ---- */
+  .screen{display:none}
+  .screen.active{display:block}
+
+  /* ---- landing ---- */
+  .hero{padding:4vh 0 9vh;display:grid;grid-template-columns:1.05fr 0.95fr;gap:60px;align-items:center}
+  @media(max-width:860px){.hero{grid-template-columns:1fr}}
+  .tag-row{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0 30px}
+  .tag-pill{font-size:12.5px;font-weight:500;color:var(--ink);background:var(--gray);border:1px solid #E4E8EB;padding:8px 16px;border-radius:100px}
+  .btn{display:inline-block;font-size:15px;font-weight:500;color:var(--white);background:var(--blue);text-decoration:none;padding:15px 32px;border-radius:100px;border:none;cursor:pointer;transition:opacity .25s ease}
+  .btn:hover{opacity:.85}
+  .btn-secondary{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+  .hero-note{display:block;margin-top:16px;font-size:13px;color:var(--ink-soft)}
+  .hero-visual{width:100%;aspect-ratio:4/5;border-radius:24px;background:linear-gradient(145deg,var(--blue-tint),var(--gray));background-size:cover;background-position:center}
+  .hero-visual.has-photo{background-image:url('assets/hero-room.jpg')}
+
+  section.block{padding:10vh 0}
+  .block-head{max-width:640px;margin-bottom:56px}
+  .block-head .lede{max-width:640px;margin-top:14px}
+  .cards-3{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+  .cards-4{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+  .steps-3{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+  @media(max-width:900px){.cards-3,.cards-4,.steps-3{grid-template-columns:1fr}}
+  .card{padding:0}
+  .card-icon{width:44px;height:44px;border-radius:12px;background:var(--blue-tint);display:flex;align-items:center;justify-content:center;color:var(--blue);font-weight:600;margin-bottom:18px}
+  .card h3{font-size:18px;font-weight:500;margin-bottom:8px}
+  .card p{font-size:14.5px;color:var(--ink-soft)}
+  .num-card .card-icon{font-size:18px}
+
+  .tint-band{background:var(--blue-tint)}
+
+  .final-cta{background:var(--blue-tint);border-radius:28px;padding:clamp(40px,6vw,64px);text-align:center;margin:6vh 0 12vh}
+  .final-cta .lede{margin:0 auto 28px;max-width:480px}
+
+  footer{padding:40px 0;text-align:center;font-size:12.5px;color:var(--ink-soft)}
+
+  /* ---- quiz ---- */
+  .quiz-shell{max-width:640px;margin:0 auto;padding:8vh 0 12vh}
+  .progress-track{height:6px;background:var(--gray);border-radius:100px;overflow:hidden;margin-bottom:36px}
+  .progress-fill{height:100%;background:var(--blue);border-radius:100px;transition:width .35s ease;width:0%}
+  .q-eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:14px}
+  .q-text{font-size:clamp(22px,2.8vw,28px);font-weight:400;line-height:1.4;margin-bottom:32px}
+  .options{display:flex;flex-direction:column;gap:12px}
+  .option-btn{text-align:left;padding:18px 22px;border-radius:14px;border:1.5px solid #E4E8EB;background:var(--white);font-family:"DM Sans",sans-serif;font-size:16px;font-weight:400;color:var(--ink);cursor:pointer;transition:all .2s ease}
+  .option-btn:hover{border-color:var(--blue);background:var(--blue-tint)}
+  .option-btn.selected{border-color:var(--blue);background:var(--blue-tint);font-weight:500}
+  .num-input-row{display:flex;gap:14px;align-items:center}
+  input[type="number"],input[type="text"],input[type="tel"]{
+    font-family:"DM Sans",sans-serif;font-size:18px;padding:16px 18px;border-radius:14px;border:1.5px solid #E4E8EB;width:100%;outline:none;transition:border-color .2s ease;color:var(--ink);
+  }
+  input[type="number"]:focus,input[type="text"]:focus,input[type="tel"]:focus{border-color:var(--blue)}
+  .q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:36px}
+  .link-btn{background:none;border:none;color:var(--ink-soft);font-family:"DM Sans",sans-serif;font-size:14px;cursor:pointer;text-decoration:underline}
+  .field-label{font-size:13px;font-weight:500;color:var(--ink-soft);margin-bottom:8px;display:block}
+  .field-group{margin-bottom:22px}
+
+  /* ---- result ---- */
+  .result-shell{max-width:640px;margin:0 auto;padding:9vh 0 12vh}
+  .result-badge{display:inline-block;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:500;color:var(--blue);background:var(--blue-tint);padding:8px 18px;border-radius:100px;margin-bottom:24px}
+  .result-copy p{font-size:16px;color:var(--ink-soft);margin-bottom:18px}
+  .result-copy p:first-child{font-size:20px;color:var(--ink);font-weight:400}
+  .result-cta{background:var(--blue-tint);border-radius:24px;padding:36px;margin-top:44px;text-align:center}
+  .result-cta p{font-size:15px;color:var(--ink);margin-bottom:22px;line-height:1.7}
+
+  @media(max-width:600px){
+    nav{padding:22px 0}
+    .hero{padding:2vh 0 6vh;gap:36px}
+    section.block{padding:7vh 0}
+    .quiz-shell,.result-shell{padding:6vh 0 8vh}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap"><nav><img class="logo-img" src="assets/logo-hydroclean.png" alt="HydroClean"></nav></div>
+
+<!-- ============ SCREEN 1: LANDING ============ -->
+<section id="screen-landing" class="screen active">
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">REST ASSURED SCORE</div>
+        <h1>Rumah terasa lebih tenang saat tahu apa yang perlu didahulukan.</h1>
+        <p class="lede">Lihat skor perawatan rumah Anda, lengkap dengan daftar prioritas permukaan yang perlu ditangani, perkiraan kapan perawatan berikutnya, dan satu langkah sederhana untuk minggu ini.</p>
+        <div class="tag-row">
+          <span class="tag-pill">±2 menit</span>
+          <span class="tag-pill">Gratis</span>
+          <span class="tag-pill">Tanpa komitmen</span>
+          <span class="tag-pill">Tanpa percakapan</span>
+        </div>
+        <button class="btn" onclick="startQuiz()">Mulai Assessment</button>
+        <span class="hero-note">Hasil Anda terasa personal, singkat, dan mudah dipahami.</span>
+      </div>
+      <div class="hero-visual" role="img" aria-label="Ruang keluarga yang tenang dan rapi"></div>
+    </div>
+  </div>
+
+  <div class="tint-band">
+    <div class="wrap block">
+      <div class="block-head">
+        <div class="eyebrow">RUMAH YANG DIRAWAT</div>
+        <h2>Perawatan rumah yang tepat membantu rumah terasa lebih nyaman untuk ditempati.</h2>
+        <p class="lede">Saat rumah dirawat sesuai kebutuhan, lebih mudah menjaga suasana yang terasa rapi, tenang, dan siap digunakan setiap hari. Assessment ini membantu Anda melihat apa yang perlu diprioritaskan tanpa harus menebak-nebak.</p>
+      </div>
+      <div class="cards-3">
+        <div class="card"><div class="card-icon">1</div><h3>Istirahat terasa lebih nyaman</h3><p>Permukaan yang digunakan setiap hari, seperti kasur, sofa, dan karpet, punya peran besar dalam rasa nyaman di rumah.</p></div>
+        <div class="card"><div class="card-icon">2</div><h3>Rumah terasa lebih menenangkan</h3><p>Saat Anda tahu area mana yang perlu diperhatikan lebih dulu, keputusan terasa lebih ringan dan rumah terasa lebih tertata.</p></div>
+        <div class="card"><div class="card-icon">3</div><h3>Prioritas jadi lebih jelas</h3><p>Anda tidak perlu memikirkan semuanya sekaligus. Mulai dari yang paling relevan untuk kondisi rumah Anda.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap block">
+    <div class="block-head">
+      <div class="eyebrow">HASIL ANDA</div>
+      <h2>Di akhir assessment, Anda akan mendapatkan gambaran yang jelas untuk rumah Anda.</h2>
+    </div>
+    <div class="cards-4">
+      <div class="card num-card"><div class="card-icon">1</div><h3>Skor perawatan rumah</h3><p>Ringkasan sederhana untuk membantu Anda melihat posisi rumah Anda saat ini.</p></div>
+      <div class="card num-card"><div class="card-icon">2</div><h3>Daftar permukaan yang perlu ditangani</h3><p>Fokus pada area yang paling layak diprioritaskan berdasarkan jawaban Anda.</p></div>
+      <div class="card num-card"><div class="card-icon">3</div><h3>Perkiraan jarak perawatan berikutnya</h3><p>Panduan waktu yang terasa masuk akal untuk membantu Anda merencanakan langkah berikutnya.</p></div>
+      <div class="card num-card"><div class="card-icon">4</div><h3>Satu langkah untuk minggu ini</h3><p>Rekomendasi kecil yang mudah dipahami agar Anda tahu harus mulai dari mana.</p></div>
+    </div>
+  </div>
+
+  <div class="tint-band">
+    <div class="wrap block">
+      <div class="block-head">
+        <div class="eyebrow">PROSESNYA SEDERHANA</div>
+        <h2>Prosesnya sederhana, dan hasilnya dibuat untuk membantu Anda mengambil langkah berikutnya.</h2>
+      </div>
+      <div class="steps-3">
+        <div class="card num-card"><div class="card-icon">1</div><h3>Jawab beberapa pertanyaan singkat</h3><p>Tentang penggunaan rumah, permukaan utama, dan kebiasaan perawatan.</p></div>
+        <div class="card num-card"><div class="card-icon">2</div><h3>Lihat hasil yang diringkas dengan jelas</h3><p>Anda akan menerima skor, prioritas permukaan, dan arahan singkat yang relevan.</p></div>
+        <div class="card num-card"><div class="card-icon">3</div><h3>Gunakan hasilnya untuk menentukan prioritas</h3><p>Dengan begitu, Anda tahu apa yang perlu didahulukan untuk rumah Anda sendiri.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="final-cta">
+      <p class="lede" style="margin-left:auto;margin-right:auto">Hanya perlu sekitar dua menit untuk mendapatkan gambaran yang lebih jelas.</p>
+      <button class="btn" onclick="startQuiz()">Mulai Assessment</button>
+      <span class="hero-note">Gratis, tanpa komitmen, dan tanpa percakapan.</span>
+    </div>
+  </div>
+
+  <footer>HydroClean — Rumah yang dirawat, keluarga yang lebih tenang.</footer>
+</section>
+
+<!-- ============ SCREEN 2: QUIZ ============ -->
+<section id="screen-quiz" class="screen">
+  <div class="wrap quiz-shell">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div id="quizBody"></div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 3: LEAD CAPTURE ============ -->
+<section id="screen-lead" class="screen">
+  <div class="wrap quiz-shell">
+    <div class="q-eyebrow">SATU LANGKAH LAGI</div>
+    <div class="q-text">Ke mana kami kirimkan hasil Anda?</div>
+    <div class="field-group">
+      <label class="field-label">Nama</label>
+      <input type="text" id="leadName" placeholder="Nama Anda">
+    </div>
+    <div class="field-group">
+      <label class="field-label">Nomor WhatsApp</label>
+      <input type="tel" id="leadPhone" placeholder="08xxxxxxxxxx">
+    </div>
+    <div class="q-nav">
+      <button class="link-btn" onclick="goToQuestion(8)">Kembali</button>
+      <button class="btn" onclick="submitLead()">Lihat Hasil Saya</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SCREEN 4: RESULT ============ -->
+<section id="screen-result" class="screen">
+  <div class="wrap result-shell">
+    <div class="result-badge" id="resultBadge"></div>
+    <div class="result-copy" id="resultCopy"></div>
+    <div class="result-cta">
+      <p>Lihat Langsung Proses Perawatan di Rumah Anda. Ingin tahu bagaimana HydroAllergenic® bekerja menjaga rumah tetap nyaman dan mendukung istirahat keluarga? Jadwalkan demonstrasi di rumah Anda dan temukan proses MicroTech-Ray® UV+O₃ yang telah dipercaya banyak keluarga.</p>
+      <a class="btn" id="resultCtaBtn" href="#" target="_blank" rel="noopener">Jadwalkan demonstrasi</a>
+    </div>
+  </div>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
