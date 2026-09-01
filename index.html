@@ -32,9 +32,9 @@
   h2{font-weight:400;font-size:clamp(24px,3vw,34px);line-height:1.32;letter-spacing:normal;margin:16px 0 14px;overflow-wrap:break-word}
   .lede{font-size:16.5px;font-weight:400;color:var(--ink-soft);max-width:520px;letter-spacing:normal}
 
-  nav{padding:24px 0;display:flex;justify-content:center;align-items:center}
+  nav{padding:24px 0;display:flex;justify-content:flex-end;align-items:center}
   .nav-outer{background:var(--blue-tint)}
-  .logo-img{height:32px;width:auto;display:block}
+  .logo-img{height:40px;width:auto;display:block}
 
   /* ---- screens ---- */
   .screen{display:none}
@@ -87,12 +87,12 @@
   .q-eyebrow{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:14px}
   .q-text{font-size:clamp(22px,2.8vw,28px);font-weight:400;line-height:1.4;margin-bottom:32px}
   .options{display:flex;flex-direction:column;gap:12px}
-  .option-btn{text-align:left;padding:18px 22px;border-radius:14px;border:1.5px solid #E4E8EB;background:var(--white);font-family:"DM Sans",sans-serif;font-size:16px;font-weight:400;color:var(--ink);cursor:pointer;transition:all .2s ease}
+  .option-btn{text-align:left;padding:18px 22px;border-radius:14px;border:1.5px solid rgba(0,174,208,.18);background:var(--white);font-family:"DM Sans",sans-serif;font-size:16px;font-weight:400;color:var(--ink);cursor:pointer;transition:all .2s ease}
   .option-btn:hover{border-color:var(--blue);background:var(--blue-tint)}
   .option-btn.selected{border-color:var(--blue);background:var(--blue-tint);font-weight:500}
   .num-input-row{display:flex;gap:14px;align-items:center}
   input[type="number"],input[type="text"],input[type="tel"]{
-    font-family:"DM Sans",sans-serif;font-size:18px;padding:16px 18px;border-radius:14px;border:1.5px solid #E4E8EB;width:100%;outline:none;transition:border-color .2s ease;color:var(--ink);
+    font-family:"DM Sans",sans-serif;font-size:18px;padding:16px 18px;border-radius:14px;border:1.5px solid rgba(0,174,208,.18);width:100%;outline:none;transition:border-color .2s ease;color:var(--ink);
   }
   input[type="number"]:focus,input[type="text"]:focus,input[type="tel"]:focus{border-color:var(--blue)}
   .q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:36px}
@@ -113,7 +113,7 @@
   .dot-medium{background:#F0A63C}
   .dot-high{background:#3FAE6B}
 
-  .score-card{border:1px solid #E4E8EB;border-radius:20px;padding:32px 28px;text-align:center;position:sticky;top:24px}
+  .score-card{border:1px solid rgba(0,174,208,.18);border-radius:20px;padding:32px 28px;text-align:center;position:sticky;top:24px}
   .score-card-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-soft);font-weight:500;margin-bottom:14px}
   .score-card-num{font-size:44px;font-weight:600;line-height:1;margin-bottom:14px}
   .score-card-num.cat-low{color:#E0554F}
@@ -136,7 +136,7 @@
 
   /* ---- multi-select (Q9) ---- */
   .option-btn.multi{display:flex;align-items:center;gap:14px}
-  .checkbox-box{width:20px;height:20px;border-radius:6px;border:1.5px solid #C7CDD1;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
+  .checkbox-box{width:20px;height:20px;border-radius:6px;border:1.5px solid rgba(0,174,208,.35);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s ease}
   .option-btn.selected .checkbox-box{background:var(--blue);border-color:var(--blue)}
   .checkbox-box svg{opacity:0;transition:opacity .15s ease}
   .option-btn.selected .checkbox-box svg{opacity:1}
@@ -152,7 +152,7 @@
 </head>
 <body>
 
-<div class="wrap nav-outer"><nav><img class="logo-img" src="assets/logo-hydroclean.png" alt="HydroClean"></nav></div>
+<div class="nav-outer"><div class="wrap"><nav><img class="logo-img" src="assets/logo-hydroclean.png" alt="HydroClean"></nav></div></div>
 
 <!-- ============ SCREEN 1: LANDING ============ -->
 <section id="screen-landing" class="screen active">
